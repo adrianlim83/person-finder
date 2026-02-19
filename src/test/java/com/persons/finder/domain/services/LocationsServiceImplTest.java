@@ -246,7 +246,7 @@ class LocationsServiceImplTest {
                 .thenReturn(geoResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0, 1000);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0, 1, 1000);
 
         // Assert
         assertThat(results).hasSize(2);
@@ -278,7 +278,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0, 1000);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0,1, 1000);
 
         // Assert
         assertThat(results).isEmpty();
@@ -298,7 +298,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        locationsService.findAround(1.3521, 103.8198, 10.0, 1000);
+        locationsService.findAround(1.3521, 103.8198, 10.0, 1, 1000);
 
         // Assert
         ArgumentCaptor<NearQuery> queryCaptor = ArgumentCaptor.forClass(NearQuery.class);
@@ -321,7 +321,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        locationsService.findAround(40.7128, -74.0060, 50.0, 1000); // New York coordinates
+        locationsService.findAround(40.7128, -74.0060, 50.0, 1, 1000); // New York coordinates
 
         // Assert
         verify(mongoTemplate).geoNear(any(NearQuery.class), eq(Person.class));
@@ -354,7 +354,7 @@ class LocationsServiceImplTest {
                 .thenReturn(geoResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 1000.0, 1000);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 1000.0, 1, 1000);
 
         // Assert
         assertThat(results).hasSize(1);
@@ -374,7 +374,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 0.0, 1000);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 0.0, 1, 1000);
 
         // Assert
         assertThat(results).isEmpty();
@@ -406,7 +406,7 @@ class LocationsServiceImplTest {
                 .thenReturn(geoResults);
 
         // Act
-        List<Location> results = locationsService.findAround(37.7749, -122.4194, 10.0, 1000);
+        List<Location> results = locationsService.findAround(37.7749, -122.4194, 10.0, 1, 1000);
 
         // Assert
         assertThat(results).hasSize(1);

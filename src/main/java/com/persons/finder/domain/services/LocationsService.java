@@ -6,5 +6,5 @@ import java.util.List;
 public interface LocationsService {
     void addLocation(Location location);
     void removeLocation(Long locationReferenceId);
-    List<Location> findAround(Double latitude, Double longitude, Double radiusInKm, Integer limit);
+    List<Location> findAround(Double latitude, Double longitude, Double radiusInKm, Integer page, Integer limit);
 }

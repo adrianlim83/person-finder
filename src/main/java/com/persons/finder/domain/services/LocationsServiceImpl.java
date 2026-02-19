@@ -6,6 +6,8 @@ import com.persons.finder.domain.Person;
 import com.persons.finder.domain.repository.PersonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.geo.Metrics;
@@ -52,14 +54,17 @@ public class LocationsServiceImpl implements LocationsService {
     }
 
     @Override
-    public List<Location> findAround(Double latitude, Double longitude, Double radiusInKm, Integer limit) {
+    public List<Location> findAround(Double latitude, Double longitude, Double radiusInKm, Integer page, Integer limit) {
         // Mongo expects (longitude, latitude)
         Point point = new Point(longitude, latitude);
+
+        int size = limit != null ? limit : locationConfig.getNearbyLimit();
+        Pageable pageable = PageRequest.of(page != null ? page - 1 : 0, size);
 
         NearQuery nearQuery = NearQuery.near(point)
                 .maxDistance(new Distance(radiusInKm, Metrics.KILOMETERS))
                 .spherical(true)
-                .limit(limit != null ? limit : locationConfig.getNearbyLimit());
+                .with(pageable);
 
         if (limit != null) {
             nearQuery = nearQuery.limit(limit);

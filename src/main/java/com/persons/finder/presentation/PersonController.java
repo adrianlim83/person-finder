@@ -45,9 +45,10 @@ public class PersonController {
         @RequestParam @NotNull @Min(-90) @Max(90) Double lat,
         @RequestParam @NotNull @Min(-180) @Max(180) Double lon,
         @RequestParam @NotNull @Min(0) @Max(20000) Double radiusInKm,
+        @RequestParam(required = false) @Min(1) Integer page,
         @RequestParam(required = false) @Min(1) @Max(1000) Integer limit
     ) {
-        List<Location> locations = locationsService.findAround(lat, lon, radiusInKm, limit);
+        List<Location> locations = locationsService.findAround(lat, lon, radiusInKm, page, limit);
         return ResponseEntity.ok(locations);
     }
 }
