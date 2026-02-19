@@ -100,13 +100,15 @@ mvn test -Dtest="PersonsServiceImplTest#save_WhenNewPersonWithNoExistingEmail_Sh
 ```
 
 ## Test Requirements
-- **JDK**: Java 17 or higher (project requires Java 21 but tests work with Java 17)
+- **JDK**: Java 21 (as specified in project pom.xml)
 - **Maven**: 3.8+
 - **Dependencies**: 
   - JUnit 5 (Jupiter)
   - Mockito 5.x
   - AssertJ 3.x
   - Spring Boot Test
+
+**Note**: Tests are compatible with Java 17 for development/CI environments where Java 21 is not available, but production code requires Java 21.
 
 ## DDD Patterns Demonstrated
 
@@ -130,11 +132,11 @@ Tests validate domain rules:
 
 ## Future Improvements
 
-1. **Integration Tests**: Add integration tests with actual MongoDB using Testcontainers
-2. **Parameterized Tests**: Use `@ParameterizedTest` for testing multiple scenarios with different inputs
-3. **Property-Based Testing**: Consider adding property-based tests for complex domain logic
-4. **Performance Tests**: Add performance benchmarks for critical operations
-5. **Fix Coordinate Mapping Bug**: The LocationsServiceImpl has a lat/lon swap bug that should be fixed in the implementation
+1. **Fix Coordinate Mapping Bug**: LocationsServiceImpl has a critical bug where latitude and longitude are swapped when creating Location DTOs (line 69). The implementation passes `getX()` (longitude) to the latitude parameter and `getY()` (latitude) to the longitude parameter. Tests are marked with TODO comments and should be updated once this bug is fixed.
+2. **Integration Tests**: Add integration tests with actual MongoDB using Testcontainers
+3. **Parameterized Tests**: Use `@ParameterizedTest` for testing multiple scenarios with different inputs
+4. **Property-Based Testing**: Consider adding property-based tests for complex domain logic
+5. **Performance Tests**: Add performance benchmarks for critical operations
 
 ## Documentation and Maintenance
 

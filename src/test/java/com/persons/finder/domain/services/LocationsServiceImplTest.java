@@ -253,10 +253,13 @@ class LocationsServiceImplTest {
 
         Location loc1 = results.get(0);
         assertThat(loc1.getReferenceId()).isEqualTo(1L);
-        // Note: Implementation has a bug where X and Y are swapped when creating Location DTO
-        // X (longitude) is passed as latitude parameter, Y (latitude) as longitude parameter
-        assertThat(loc1.getLatitude()).isEqualTo(103.8198);  // Actually longitude from GeoJSON
-        assertThat(loc1.getLongitude()).isEqualTo(1.3521);   // Actually latitude from GeoJSON
+        // TODO: KNOWN BUG - Implementation swaps latitude/longitude when creating Location DTO
+        // The implementation passes GeoJSON.getX() (longitude) to latitude parameter
+        // and GeoJSON.getY() (latitude) to longitude parameter.
+        // These assertions should be reversed once the bug is fixed in LocationsServiceImpl line 69
+        // Expected (after fix): latitude=1.3521, longitude=103.8198
+        assertThat(loc1.getLatitude()).isEqualTo(103.8198);  // Currently gets longitude value
+        assertThat(loc1.getLongitude()).isEqualTo(1.3521);   // Currently gets latitude value
         assertThat(loc1.getDistanceInKm()).isEqualTo(1.5);
         assertThat(loc1.getBio()).isEqualTo("Bio 1");
 
@@ -413,9 +416,12 @@ class LocationsServiceImplTest {
         // Assert
         assertThat(results).hasSize(1);
         Location location = results.get(0);
-        // Note: Implementation has a bug where getX() (longitude) is assigned to latitude field
-        // and getY() (latitude) is assigned to longitude field in the Location DTO
-        assertThat(location.getLatitude()).isEqualTo(-122.4194);  // Actually longitude from GeoJSON
-        assertThat(location.getLongitude()).isEqualTo(37.7749);   // Actually latitude from GeoJSON
+        // TODO: KNOWN BUG - Implementation swaps latitude/longitude in Location DTO creation
+        // GeoJSON correctly stores coordinates as [longitude, latitude] (X=lon, Y=lat)
+        // but LocationsServiceImpl.findAround() line 69 incorrectly passes them as:
+        // new Location(id, getX(), getY(), ...) where constructor expects (id, lat, lon, ...)
+        // Expected (after fix): latitude=37.7749, longitude=-122.4194
+        assertThat(location.getLatitude()).isEqualTo(-122.4194);  // Currently gets longitude value
+        assertThat(location.getLongitude()).isEqualTo(37.7749);   // Currently gets latitude value
     }
 }
