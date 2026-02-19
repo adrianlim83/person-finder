@@ -165,7 +165,7 @@ class PersonsServiceImplTest {
         assertThat(result.getBio()).isEqualTo("AI generated bio for Jane");
 
         verify(personRepository).findByEmail("jane.smith@example.com");
-        verify(sequenceGeneratorService).generateSequence(com.persons.finder.domain.Person.class.getName());
+        verify(sequenceGeneratorService).generateSequence(com.persons.finder.domain.Person.class.getSimpleName());
         verify(inputSanitizer).sanitize("Jane Smith");
         verify(inputSanitizer).sanitize("Product Manager");
         verify(inputSanitizer).sanitizeList(anyList());
