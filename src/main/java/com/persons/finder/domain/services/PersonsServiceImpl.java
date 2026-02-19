@@ -53,7 +53,7 @@ public class PersonsServiceImpl implements PersonsService {
         domainPerson.setEmail(person.getEmail().trim().toLowerCase());
         domainPerson.setJobTitle(inputSanitizer.sanitize(person.getJobTitle()));
         domainPerson.setHobbies(inputSanitizer.sanitizeList(person.getHobbies()));
-        domainPerson.setBio(aiBioService.generateBio(person.getName(), person.getHobbies()));
+        domainPerson.setBio(aiBioService.generateBio(person.getJobTitle(), person.getHobbies()));
 
         domainPerson = personRepository.save(domainPerson);
 

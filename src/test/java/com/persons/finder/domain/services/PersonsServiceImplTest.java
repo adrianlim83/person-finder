@@ -139,7 +139,7 @@ class PersonsServiceImplTest {
         when(inputSanitizer.sanitize("Jane Smith")).thenReturn("Jane Smith");
         when(inputSanitizer.sanitize("Product Manager")).thenReturn("Product Manager");
         when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Yoga", "Travel"));
-        when(aiBioService.generateBio("Jane Smith", Arrays.asList("Yoga", "Travel")))
+        when(aiBioService.generateBio("Product Manager", Arrays.asList("Yoga", "Travel")))
                 .thenReturn("AI generated bio for Jane");
 
         com.persons.finder.domain.Person savedDomainPerson = com.persons.finder.domain.Person.builder()
@@ -169,7 +169,7 @@ class PersonsServiceImplTest {
         verify(inputSanitizer).sanitize("Jane Smith");
         verify(inputSanitizer).sanitize("Product Manager");
         verify(inputSanitizer).sanitizeList(anyList());
-        verify(aiBioService).generateBio("Jane Smith", Arrays.asList("Yoga", "Travel"));
+        verify(aiBioService).generateBio("Product Manager", Arrays.asList("Yoga", "Travel"));
         verify(personRepository).save(any(com.persons.finder.domain.Person.class));
     }
 
@@ -201,7 +201,7 @@ class PersonsServiceImplTest {
         when(inputSanitizer.sanitize("John Doe Updated")).thenReturn("John Doe Updated");
         when(inputSanitizer.sanitize("Senior Software Engineer")).thenReturn("Senior Software Engineer");
         when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Reading", "Running"));
-        when(aiBioService.generateBio("John Doe Updated", Arrays.asList("Reading", "Running")))
+        when(aiBioService.generateBio("Senior Software Engineer", Arrays.asList("Reading", "Running")))
                 .thenReturn("Updated bio content");
 
         com.persons.finder.domain.Person updatedDomainPerson = com.persons.finder.domain.Person.builder()
@@ -248,7 +248,7 @@ class PersonsServiceImplTest {
         when(inputSanitizer.sanitize("John Doe Updated")).thenReturn("John Doe Updated");
         when(inputSanitizer.sanitize("Tech Lead")).thenReturn("Tech Lead");
         when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Reading", "Teaching"));
-        when(aiBioService.generateBio("John Doe Updated", Arrays.asList("Reading", "Teaching")))
+        when(aiBioService.generateBio("Tech Lead", Arrays.asList("Reading", "Teaching")))
                 .thenReturn("Updated bio for tech lead");
 
         com.persons.finder.domain.Person updatedDomainPerson = com.persons.finder.domain.Person.builder()
@@ -402,7 +402,7 @@ class PersonsServiceImplTest {
         when(sequenceGeneratorService.generateSequence(anyString())).thenReturn(5L);
         when(inputSanitizer.sanitize(anyString())).thenAnswer(i -> i.getArgument(0));
         when(inputSanitizer.sanitizeList(anyList())).thenAnswer(i -> i.getArgument(0));
-        when(aiBioService.generateBio("AI Test User", Arrays.asList("AI", "ML", "Deep Learning")))
+        when(aiBioService.generateBio("AI Researcher", Arrays.asList("AI", "ML", "Deep Learning")))
                 .thenReturn("Expert in AI, ML, and Deep Learning with passion for innovation");
 
         com.persons.finder.domain.Person savedPerson = com.persons.finder.domain.Person.builder()
@@ -421,6 +421,6 @@ class PersonsServiceImplTest {
 
         // Assert
         assertThat(result.getBio()).isEqualTo("Expert in AI, ML, and Deep Learning with passion for innovation");
-        verify(aiBioService).generateBio("AI Test User", Arrays.asList("AI", "ML", "Deep Learning"));
+        verify(aiBioService).generateBio("AI Researcher", Arrays.asList("AI", "ML", "Deep Learning"));
     }
 }
