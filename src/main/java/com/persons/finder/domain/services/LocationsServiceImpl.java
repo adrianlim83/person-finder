@@ -1,5 +1,6 @@
 package com.persons.finder.domain.services;
 
+import com.persons.finder.config.LocationConfig;
 import com.persons.finder.data.Location;
 import com.persons.finder.domain.Person;
 import com.persons.finder.domain.repository.PersonRepository;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class LocationsServiceImpl implements LocationsService {
-
+    private final LocationConfig locationConfig;
     private final PersonRepository personRepository;
     private final MongoTemplate mongoTemplate;
 
@@ -51,13 +52,18 @@ public class LocationsServiceImpl implements LocationsService {
     }
 
     @Override
-    public List<Location> findAround(Double latitude, Double longitude, Double radiusInKm) {
+    public List<Location> findAround(Double latitude, Double longitude, Double radiusInKm, Integer limit) {
         // Mongo expects (longitude, latitude)
         Point point = new Point(longitude, latitude);
 
         NearQuery nearQuery = NearQuery.near(point)
                 .maxDistance(new Distance(radiusInKm, Metrics.KILOMETERS))
-                .spherical(true);
+                .spherical(true)
+                .limit(limit != null ? limit : locationConfig.getNearbyLimit());
+
+        if (limit != null) {
+            nearQuery = nearQuery.limit(limit);
+        }
 
         GeoResults<Person> results = mongoTemplate.geoNear(nearQuery, Person.class);
 

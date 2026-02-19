@@ -44,9 +44,10 @@ public class PersonController {
     public ResponseEntity<List<Location>> findNearby(
         @RequestParam @NotNull @Min(-90) @Max(90) Double lat,
         @RequestParam @NotNull @Min(-180) @Max(180) Double lon,
-        @RequestParam @NotNull @Min(0) @Max(20000) Double radiusInKm
+        @RequestParam @NotNull @Min(0) @Max(20000) Double radiusInKm,
+        @RequestParam(required = false) @Min(1) @Max(1000) Integer limit
     ) {
-        List<Location> locations = locationsService.findAround(lat, lon, radiusInKm);
+        List<Location> locations = locationsService.findAround(lat, lon, radiusInKm, limit);
         return ResponseEntity.ok(locations);
     }
 }

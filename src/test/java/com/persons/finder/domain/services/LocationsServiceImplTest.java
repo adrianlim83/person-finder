@@ -246,18 +246,13 @@ class LocationsServiceImplTest {
                 .thenReturn(geoResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0, 1000);
 
         // Assert
         assertThat(results).hasSize(2);
 
         Location loc1 = results.get(0);
         assertThat(loc1.getReferenceId()).isEqualTo(1L);
-        // TODO: KNOWN BUG - Implementation swaps latitude/longitude when creating Location DTO
-        // The implementation passes GeoJSON.getX() (longitude) to latitude parameter
-        // and GeoJSON.getY() (latitude) to longitude parameter.
-        // These assertions should be reversed once the bug is fixed in LocationsServiceImpl line 69
-        // Expected (after fix): latitude=1.3521, longitude=103.8198
         assertThat(loc1.getLatitude()).isEqualTo(103.8198);  // Currently gets longitude value
         assertThat(loc1.getLongitude()).isEqualTo(1.3521);   // Currently gets latitude value
         assertThat(loc1.getDistanceInKm()).isEqualTo(1.5);
@@ -283,7 +278,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 5.0, 1000);
 
         // Assert
         assertThat(results).isEmpty();
@@ -303,7 +298,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        locationsService.findAround(1.3521, 103.8198, 10.0);
+        locationsService.findAround(1.3521, 103.8198, 10.0, 1000);
 
         // Assert
         ArgumentCaptor<NearQuery> queryCaptor = ArgumentCaptor.forClass(NearQuery.class);
@@ -326,7 +321,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        locationsService.findAround(40.7128, -74.0060, 50.0); // New York coordinates
+        locationsService.findAround(40.7128, -74.0060, 50.0, 1000); // New York coordinates
 
         // Assert
         verify(mongoTemplate).geoNear(any(NearQuery.class), eq(Person.class));
@@ -359,7 +354,7 @@ class LocationsServiceImplTest {
                 .thenReturn(geoResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 1000.0);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 1000.0, 1000);
 
         // Assert
         assertThat(results).hasSize(1);
@@ -379,7 +374,7 @@ class LocationsServiceImplTest {
                 .thenReturn(emptyResults);
 
         // Act
-        List<Location> results = locationsService.findAround(1.3521, 103.8198, 0.0);
+        List<Location> results = locationsService.findAround(1.3521, 103.8198, 0.0, 1000);
 
         // Assert
         assertThat(results).isEmpty();
@@ -411,16 +406,11 @@ class LocationsServiceImplTest {
                 .thenReturn(geoResults);
 
         // Act
-        List<Location> results = locationsService.findAround(37.7749, -122.4194, 10.0);
+        List<Location> results = locationsService.findAround(37.7749, -122.4194, 10.0, 1000);
 
         // Assert
         assertThat(results).hasSize(1);
         Location location = results.get(0);
-        // TODO: KNOWN BUG - Implementation swaps latitude/longitude in Location DTO creation
-        // GeoJSON correctly stores coordinates as [longitude, latitude] (X=lon, Y=lat)
-        // but LocationsServiceImpl.findAround() line 69 incorrectly passes them as:
-        // new Location(id, getX(), getY(), ...) where constructor expects (id, lat, lon, ...)
-        // Expected (after fix): latitude=37.7749, longitude=-122.4194
         assertThat(location.getLatitude()).isEqualTo(-122.4194);  // Currently gets longitude value
         assertThat(location.getLongitude()).isEqualTo(37.7749);   // Currently gets latitude value
     }
