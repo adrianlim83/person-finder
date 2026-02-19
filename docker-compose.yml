@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  person-finder:
+    container_name: person-finder
+    build:
+      context: ./
+    environment:
+      - mongodb_host=personfinder.lsfqe0k.mongodb.net
+      - mongodb_username=
+      - mongodb_password=
+      - database_name=
+      - heap_min=2g
+      - heap_max=4g
+    ports:
+      - 8086:8086
+    healthcheck:
+      test: "exit 0"
+
