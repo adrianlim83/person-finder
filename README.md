@@ -75,7 +75,7 @@ curl -X POST http://localhost:8080/api/v1/persons \
   "email": "alice@example.com",
   "jobTitle": "Software Engineer",
   "hobbies": ["coding", "hiking", "photography"],
-  "bio": "Say hello to a Alice Smith secretly devoted to Coding side projects and Open source contribution like there's no tomorrow!"
+  "bio": "Say hello to a Software Engineer secretly devoted to Coding side projects and Open source contribution like there's no tomorrow!"
 }
 ```
 
@@ -104,14 +104,14 @@ curl "http://localhost:8080/api/v1/persons/nearby?lat=3.083751&lon=101.574040&ra
     "latitude": 101.570534,
     "longitude": 3.09296,
     "distanceInKm": 0.0,
-    "bio": "Say hello to a Alice Smith with a passion for Coding side projects and Open source contribution in their spare time!"
+    "bio": "Say hello to a Software Engineer with a passion for Coding side projects and Open source contribution in their spare time!"
   },
   {
     "referenceId": 2,
     "latitude": 101.57404,
     "longitude": 3.083751,
     "distanceInKm": 1.0967203802763552,
-    "bio": "Say hello to a Adrian secretly devoted to Coding side projects and Open source contribution like there's no tomorrow!"
+    "bio": "Say hello to a Software Engineer secretly devoted to Coding side projects and Open source contribution like there's no tomorrow!"
   }
 ]
 ```
