@@ -19,7 +19,6 @@ A production-ready Spring Boot REST API for managing person profiles with AI-gen
 - **MongoDB 7.0**
 - **Maven**
 - **Lombok**
-- **MapStruct**
 
 ## Prerequisites
 
@@ -29,24 +28,26 @@ A production-ready Spring Boot REST API for managing person profiles with AI-gen
 
 ## Getting Started
 
-### 1. Start MongoDB
-
-```bash
-docker-compose up -d
-```
-
-This will start MongoDB on `localhost:27017`.
-
-### 2. Build the application
+### 1. Build the application
 
 ```bash
 mvn clean install
 ```
 
+### 2. Set up the following environment variables:
+-- `mongodb_host`: Your MongoDB host address
+-- `mongodb_username`: Your MongoDB username
+-- `mongodb_password`: Your MongoDB password
+-- `mongodb_database`: Your MongoDB database name
+
+Note: If you modify the environment variables in docker-compose.yml, 
+please do not commit the file. You must also remove the credentials 
+after testing before using any internal AI chat tools.
+
 ### 3. Run the application
 
 ```bash
-mvn spring-boot:run
+mvn spring-boot:run {{Including the above environment variables, e.g., -Dmongodb_host=... -Dmongodb_username=... -Dmongodb_password=...}}
 ```
 
 The API will be available at `http://localhost:8080`.
@@ -56,85 +57,77 @@ The API will be available at `http://localhost:8080`.
 ### Create Person
 
 ```bash
-curl -X POST http://localhost:8080/persons \
+curl -X POST http://localhost:8080/api/v1/persons \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Alice Smith",
+    "email": "alice@example.com",
     "jobTitle": "Software Engineer",
-    "hobbies": ["coding", "hiking", "photography"],
-    "location": {
-      "latitude": 40.7128,
-      "longitude": -74.0060
-    }
+    "hobbies": ["coding", "hiking", "photography"]
   }'
 ```
 
 **Response:**
 ```json
 {
-  "id": "507f1f77bcf86cd799439011",
+  "id": 1,
   "name": "Alice Smith",
+  "email": "alice@example.com",
   "jobTitle": "Software Engineer",
   "hobbies": ["coding", "hiking", "photography"],
-  "location": {
-    "latitude": 40.7128,
-    "longitude": -74.006
-  },
-  "bio": "Meet a Software Engineer who moonlights as coding and hiking like there's no tomorrow!"
+  "bio": "Say hello to a Alice Smith secretly devoted to Coding side projects and Open source contribution like there's no tomorrow!"
 }
 ```
 
 ### Update Location
 
 ```bash
-curl -X PUT http://localhost:8080/persons/507f1f77bcf86cd799439011/location \
+curl -X PUT http://localhost:8080/api/v1/persons/1/location \
   -H "Content-Type: application/json" \
   -d '{
-    "latitude": 40.7589,
-    "longitude": -73.9851
+    "latitude": 3.083751,
+    "longitude": 101.574040
   }'
 ```
 
 ### Find Nearby Persons
 
 ```bash
-curl "http://localhost:8080/persons/nearby?lat=40.7128&lon=-74.0060&radiusInKm=10"
+curl "http://localhost:8080/api/v1/persons/nearby?lat=3.083751&lon=101.574040&radiusInKm=10"
 ```
 
 **Response:**
 ```json
 [
   {
-    "id": "507f1f77bcf86cd799439011",
-    "name": "Alice Smith",
-    "jobTitle": "Software Engineer",
-    "hobbies": ["coding", "hiking"],
-    "location": {
-      "latitude": 40.7589,
-      "longitude": -73.9851
-    },
-    "bio": "Meet a Software Engineer...",
-    "distanceInKm": 5.2
+    "referenceId": 1,
+    "latitude": 101.570534,
+    "longitude": 3.09296,
+    "distanceInKm": 0.0,
+    "bio": "Say hello to a Alice Smith with a passion for Coding side projects and Open source contribution in their spare time!"
+  },
+  {
+    "referenceId": 2,
+    "latitude": 101.57404,
+    "longitude": 3.083751,
+    "distanceInKm": 1.0967203802763552,
+    "bio": "Say hello to a Adrian secretly devoted to Coding side projects and Open source contribution like there's no tomorrow!"
   }
 ]
 ```
 
 ## Configuration
 
-Edit `src/main/resources/application.yml`:
+Edit `src/main/resources/application.properties`:
 
-```yaml
-ai:
-  provider: mock  # Options: mock, openai
-  openai:
-    api-key: YOUR_API_KEY_HERE  # Replace with your OpenAI API key
-    model: gpt-3.5-turbo
-    max-tokens: 100
-
-spring:
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/personfinder
+```properties
+ai.provider=mock  # Options: mock, openai
+ai.openai.api-key=YOUR_API_KEY_HERE
+ai.openai.model=gpt-3.5-turbo
+ai.openai.max-tokens=100
+ai.openai.temperature=0.7
+ai.openai.timeout-in-seconds=60
+security.input.max-length=500
 ```
 
 ## Running Tests
@@ -151,14 +144,10 @@ src/
 │   └── java/com/persons/finder/
 │       ├── ai/              # AI service interface and implementations
 │       ├── config/          # Spring configuration classes
-│       ├── controller/      # REST controllers
-│       ├── domain/          # Domain entities
-│       ├── dto/             # Data Transfer Objects
+│       ├── data/            # data presentational objects
+│       ├── domain/          # Domain entities, repositories, and services
 │       ├── exception/       # Exception handling
-│       ├── repository/      # MongoDB repositories
 │       ├── security/        # Security utilities (input sanitization)
-│       ├── service/         # Business logic
-│       └── util/            # Utility classes (Haversine, mappers)
 └── test/                    # Unit tests
 ```
 
@@ -206,7 +195,7 @@ docker-compose down -v
 ### Build and Run
 ```bash
 mvn clean install
-mvn spring-boot:run
+mvn spring-boot:run {{Including the above environment variables, e.g., -Dmongodb_host=... -Dmongodb_username=... -Dmongodb_password=...}}
 ```
 
 ### Run Tests Only
@@ -217,7 +206,7 @@ mvn test
 ### Package as JAR
 ```bash
 mvn clean package
-java -jar target/PersonsFinder-0.0.1-SNAPSHOT.jar
+java -jar target/person-finder-api-0.0.1-SNAPSHOT.jar {{Including the above environment variables, e.g., -Dmongodb_host=... -Dmongodb_username=... -Dmongodb_password=...}}
 ```
 
 ## Documentation
