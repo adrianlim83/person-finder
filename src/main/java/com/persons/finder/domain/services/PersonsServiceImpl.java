@@ -38,7 +38,7 @@ public class PersonsServiceImpl implements PersonsService {
             if (existingPerson != null) {
                 domainPerson = existingPerson;
             } else {
-                long newId = sequenceGeneratorService.generateSequence(com.persons.finder.domain.Person.class.getName());
+                long newId = sequenceGeneratorService.generateSequence(com.persons.finder.domain.Person.class.getSimpleName());
                 domainPerson = com.persons.finder.domain.Person.builder()
                         .id(newId)
                         .build();
