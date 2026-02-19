@@ -134,7 +134,7 @@ class PersonsServiceImplTest {
 
         when(personRepository.findByEmail("jane.smith@example.com"))
                 .thenReturn(null);
-        when(sequenceGeneratorService.generateSequence(com.persons.finder.domain.Person.class.getName()))
+        when(sequenceGeneratorService.generateSequence(com.persons.finder.domain.Person.class.getSimpleName()))
                 .thenReturn(2L);
         when(inputSanitizer.sanitize("Jane Smith")).thenReturn("Jane Smith");
         when(inputSanitizer.sanitize("Product Manager")).thenReturn("Product Manager");
