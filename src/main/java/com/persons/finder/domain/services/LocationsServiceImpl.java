@@ -66,10 +66,6 @@ public class LocationsServiceImpl implements LocationsService {
                 .spherical(true)
                 .with(pageable);
 
-        if (limit != null) {
-            nearQuery = nearQuery.limit(limit);
-        }
-
         GeoResults<Person> results = mongoTemplate.geoNear(nearQuery, Person.class);
 
         // Map results to DTO with distance
