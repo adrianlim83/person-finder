@@ -29,7 +29,7 @@ on:
   push:
     branches: [ "main", "feature/*", "bugfix/*" ]
 
-env:
+#env:
 #  ECR_REPOSITORY: person-finder                                       # set this to your Amazon ECR repository name
 #  ECS_SERVICE: person-finder                                          # set this to your Amazon ECS service name
 #  ECS_SERVICE_QA: person-finder-qa                                    # set this to your Amazon ECS service name
