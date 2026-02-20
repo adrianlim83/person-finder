@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,9 +43,6 @@ import static org.mockito.Mockito.*;
 class PersonsServiceImplTest {
 
     @Mock
-    private SequenceGeneratorService sequenceGeneratorService;
-
-    @Mock
     private PersonRepository personRepository;
 
     @Mock
@@ -63,10 +61,11 @@ class PersonsServiceImplTest {
     @BeforeEach
     void setUp() {
         // Arrange - Set up common test data
+        String personId = UUID.randomUUID().toString();
         hobbies = Arrays.asList("Reading", "Gaming", "Coding");
         
         domainPerson = com.persons.finder.domain.Person.builder()
-                .id(1L)
+                .id(personId)
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .jobTitle("Software Engineer")
@@ -75,7 +74,7 @@ class PersonsServiceImplTest {
                 .build();
 
         dataPerson = new Person(
-                1L,
+                personId,
                 "John Doe",
                 "john.doe@example.com",
                 "Software Engineer",
@@ -88,35 +87,36 @@ class PersonsServiceImplTest {
     @DisplayName("getById should return person when person exists")
     void getById_WhenPersonExists_ShouldReturnPerson() {
         // Arrange
-        when(personRepository.findById(1L)).thenReturn(Optional.of(domainPerson));
+        when(personRepository.findById(dataPerson.getId())).thenReturn(Optional.of(domainPerson));
 
         // Act
-        Person result = personsService.getById(1L);
+        Person result = personsService.getById(dataPerson.getId());
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo("John Doe");
-        assertThat(result.getEmail()).isEqualTo("john.doe@example.com");
-        assertThat(result.getJobTitle()).isEqualTo("Software Engineer");
-        assertThat(result.getHobbies()).containsExactlyElementsOf(hobbies);
-        assertThat(result.getBio()).isEqualTo("Generated bio content");
+        assertThat(result.getId()).isEqualTo(domainPerson.getId());
+        assertThat(result.getName()).isEqualTo(domainPerson.getName());
+        assertThat(result.getEmail()).isEqualTo(domainPerson.getEmail());
+        assertThat(result.getJobTitle()).isEqualTo(domainPerson.getJobTitle());
+        assertThat(result.getHobbies()).containsExactlyElementsOf(domainPerson.getHobbies());
+        assertThat(result.getBio()).isEqualTo(domainPerson.getBio());
 
-        verify(personRepository).findById(1L);
+        verify(personRepository).findById(domainPerson.getId());
     }
 
     @Test
     @DisplayName("getById should throw PersonNotFoundException when person does not exist")
     void getById_WhenPersonDoesNotExist_ShouldThrowException() {
         // Arrange
-        when(personRepository.findById(999L)).thenReturn(Optional.empty());
+        String personIdNotExist = UUID.randomUUID().toString();
+        when(personRepository.findById(personIdNotExist)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> personsService.getById(999L))
+        assertThatThrownBy(() -> personsService.getById(personIdNotExist))
                 .isInstanceOf(PersonNotFoundException.class)
-                .hasMessageContaining("Person not found with id: 999");
+                .hasMessageContaining("Person not found with id: " + personIdNotExist);
 
-        verify(personRepository).findById(999L);
+        verify(personRepository).findById(personIdNotExist);
     }
 
     @Test
@@ -134,8 +134,6 @@ class PersonsServiceImplTest {
 
         when(personRepository.findByEmail("jane.smith@example.com"))
                 .thenReturn(null);
-        when(sequenceGeneratorService.generateSequence(com.persons.finder.domain.Person.class.getSimpleName()))
-                .thenReturn(2L);
         when(inputSanitizer.sanitize("Jane Smith")).thenReturn("Jane Smith");
         when(inputSanitizer.sanitize("Product Manager")).thenReturn("Product Manager");
         when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Yoga", "Travel"));
@@ -143,7 +141,7 @@ class PersonsServiceImplTest {
                 .thenReturn("AI generated bio for Jane");
 
         com.persons.finder.domain.Person savedDomainPerson = com.persons.finder.domain.Person.builder()
-                .id(2L)
+                .id(UUID.randomUUID().toString())
                 .name("Jane Smith")
                 .email("jane.smith@example.com")
                 .jobTitle("Product Manager")
@@ -159,17 +157,16 @@ class PersonsServiceImplTest {
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(2L);
-        assertThat(result.getName()).isEqualTo("Jane Smith");
-        assertThat(result.getEmail()).isEqualTo("jane.smith@example.com");
-        assertThat(result.getBio()).isEqualTo("AI generated bio for Jane");
+        assertThat(result.getId()).isEqualTo(savedDomainPerson.getId());
+        assertThat(result.getName()).isEqualTo(savedDomainPerson.getName());
+        assertThat(result.getEmail()).isEqualTo(savedDomainPerson.getEmail());
+        assertThat(result.getBio()).isEqualTo(savedDomainPerson.getBio());
 
-        verify(personRepository).findByEmail("jane.smith@example.com");
-        verify(sequenceGeneratorService).generateSequence(com.persons.finder.domain.Person.class.getSimpleName());
-        verify(inputSanitizer).sanitize("Jane Smith");
-        verify(inputSanitizer).sanitize("Product Manager");
+        verify(personRepository).findByEmail(savedDomainPerson.getEmail());
+        verify(inputSanitizer).sanitize(savedDomainPerson.getName());
+        verify(inputSanitizer).sanitize(savedDomainPerson.getJobTitle());
         verify(inputSanitizer).sanitizeList(anyList());
-        verify(aiBioService).generateBio("Product Manager", Arrays.asList("Yoga", "Travel"));
+        verify(aiBioService).generateBio(savedDomainPerson.getJobTitle(), savedDomainPerson.getHobbies());
         verify(personRepository).save(any(com.persons.finder.domain.Person.class));
     }
 
@@ -188,7 +185,7 @@ class PersonsServiceImplTest {
 
         // Existing person in database
         com.persons.finder.domain.Person existingDomainPerson = com.persons.finder.domain.Person.builder()
-                .id(1L)
+                .id(UUID.randomUUID().toString())
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .jobTitle("Software Engineer")
@@ -196,16 +193,16 @@ class PersonsServiceImplTest {
                 .bio("Old bio")
                 .build();
 
-        when(personRepository.findByEmail("john.doe@example.com"))
+        when(personRepository.findByEmail(existingDomainPerson.getEmail()))
                 .thenReturn(existingDomainPerson);
-        when(inputSanitizer.sanitize("John Doe Updated")).thenReturn("John Doe Updated");
-        when(inputSanitizer.sanitize("Senior Software Engineer")).thenReturn("Senior Software Engineer");
-        when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Reading", "Running"));
-        when(aiBioService.generateBio("Senior Software Engineer", Arrays.asList("Reading", "Running")))
+        when(inputSanitizer.sanitize(personData.getName())).thenReturn(personData.getName());
+        when(inputSanitizer.sanitize(personData.getJobTitle())).thenReturn(personData.getJobTitle());
+        when(inputSanitizer.sanitizeList(anyList())).thenReturn(personData.getHobbies());
+        when(aiBioService.generateBio(personData.getJobTitle(), personData.getHobbies()))
                 .thenReturn("Updated bio content");
 
         com.persons.finder.domain.Person updatedDomainPerson = com.persons.finder.domain.Person.builder()
-                .id(1L)
+                .id(existingDomainPerson.getId())
                 .name("John Doe Updated")
                 .email("john.doe@example.com")
                 .jobTitle("Senior Software Engineer")
@@ -221,13 +218,12 @@ class PersonsServiceImplTest {
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(existingDomainPerson.getId());
         assertThat(result.getName()).isEqualTo("John Doe Updated");
         assertThat(result.getJobTitle()).isEqualTo("Senior Software Engineer");
         assertThat(result.getBio()).isEqualTo("Updated bio content");
 
         verify(personRepository).findByEmail("john.doe@example.com");
-        verify(sequenceGeneratorService, never()).generateSequence(anyString());
         verify(personRepository).save(any(com.persons.finder.domain.Person.class));
     }
 
@@ -236,7 +232,7 @@ class PersonsServiceImplTest {
     void save_WhenPersonWithIdExists_ShouldUpdatePerson() {
         // Arrange
         Person updatePerson = new Person(
-                1L,
+                domainPerson.getId(),
                 "John Doe Updated",
                 "john.updated@example.com",
                 "Tech Lead",
@@ -244,15 +240,15 @@ class PersonsServiceImplTest {
                 null
         );
 
-        when(personRepository.findById(1L)).thenReturn(Optional.of(domainPerson));
-        when(inputSanitizer.sanitize("John Doe Updated")).thenReturn("John Doe Updated");
-        when(inputSanitizer.sanitize("Tech Lead")).thenReturn("Tech Lead");
+        when(personRepository.findById(domainPerson.getId())).thenReturn(Optional.of(domainPerson));
+        when(inputSanitizer.sanitize(updatePerson.getName())).thenReturn("John Doe Updated");
+        when(inputSanitizer.sanitize(updatePerson.getJobTitle())).thenReturn("Tech Lead");
         when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Reading", "Teaching"));
-        when(aiBioService.generateBio("Tech Lead", Arrays.asList("Reading", "Teaching")))
+        when(aiBioService.generateBio(updatePerson.getJobTitle(), updatePerson.getHobbies()))
                 .thenReturn("Updated bio for tech lead");
 
         com.persons.finder.domain.Person updatedDomainPerson = com.persons.finder.domain.Person.builder()
-                .id(1L)
+                .id(domainPerson.getId())
                 .name("John Doe Updated")
                 .email("john.updated@example.com")
                 .jobTitle("Tech Lead")
@@ -268,15 +264,14 @@ class PersonsServiceImplTest {
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo("John Doe Updated");
-        assertThat(result.getEmail()).isEqualTo("john.updated@example.com");
-        assertThat(result.getJobTitle()).isEqualTo("Tech Lead");
-        assertThat(result.getBio()).isEqualTo("Updated bio for tech lead");
+        assertThat(result.getId()).isEqualTo(domainPerson.getId());
+        assertThat(result.getName()).isEqualTo(updatedDomainPerson.getName());
+        assertThat(result.getEmail()).isEqualTo(updatedDomainPerson.getEmail());
+        assertThat(result.getJobTitle()).isEqualTo(updatedDomainPerson.getJobTitle());
+        assertThat(result.getBio()).isEqualTo(updatedDomainPerson.getBio());
 
-        verify(personRepository).findById(1L);
+        verify(personRepository).findById(domainPerson.getId());
         verify(personRepository, never()).findByEmail(anyString());
-        verify(sequenceGeneratorService, never()).generateSequence(anyString());
         verify(personRepository).save(any(com.persons.finder.domain.Person.class));
     }
 
@@ -284,8 +279,9 @@ class PersonsServiceImplTest {
     @DisplayName("save should throw PersonNotFoundException when updating non-existent person")
     void save_WhenPersonWithIdDoesNotExist_ShouldThrowException() {
         // Arrange
+        String personIdNotExist = UUID.randomUUID().toString();
         Person updatePerson = new Person(
-                999L,
+                personIdNotExist,
                 "Non Existent",
                 "nonexistent@example.com",
                 "Developer",
@@ -293,14 +289,14 @@ class PersonsServiceImplTest {
                 null
         );
 
-        when(personRepository.findById(999L)).thenReturn(Optional.empty());
+        when(personRepository.findById(personIdNotExist)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> personsService.save(updatePerson))
                 .isInstanceOf(PersonNotFoundException.class)
-                .hasMessageContaining("Person not found with id: 999");
+                .hasMessageContaining("Person not found with id: " + personIdNotExist);
 
-        verify(personRepository).findById(999L);
+        verify(personRepository).findById(personIdNotExist);
         verify(personRepository, never()).save(any());
     }
 
@@ -318,14 +314,13 @@ class PersonsServiceImplTest {
         );
 
         when(personRepository.findByEmail("user@example.com")).thenReturn(null);
-        when(sequenceGeneratorService.generateSequence(anyString())).thenReturn(3L);
         when(inputSanitizer.sanitize("User with <script>")).thenReturn("User with ");
         when(inputSanitizer.sanitize("Job with injection attempt")).thenReturn("Job with  attempt");
         when(inputSanitizer.sanitizeList(anyList())).thenReturn(Arrays.asList("Hobby1", "Hobby2"));
         when(aiBioService.generateBio(anyString(), anyList())).thenReturn("Safe bio");
 
         com.persons.finder.domain.Person savedPerson = com.persons.finder.domain.Person.builder()
-                .id(3L)
+                .id(UUID.randomUUID().toString())
                 .name("User with ")
                 .email("user@example.com")
                 .jobTitle("Job with  attempt")
@@ -361,13 +356,12 @@ class PersonsServiceImplTest {
         );
 
         when(personRepository.findByEmail("test.user@example.com")).thenReturn(null);
-        when(sequenceGeneratorService.generateSequence(anyString())).thenReturn(4L);
         when(inputSanitizer.sanitize(anyString())).thenAnswer(i -> i.getArgument(0));
         when(inputSanitizer.sanitizeList(anyList())).thenAnswer(i -> i.getArgument(0));
         when(aiBioService.generateBio(anyString(), anyList())).thenReturn("Test bio");
 
         com.persons.finder.domain.Person savedPerson = com.persons.finder.domain.Person.builder()
-                .id(4L)
+                .id(UUID.randomUUID().toString())
                 .name("Test User")
                 .email("test.user@example.com")
                 .jobTitle("Tester")
@@ -399,14 +393,13 @@ class PersonsServiceImplTest {
         );
 
         when(personRepository.findByEmail("ai.test@example.com")).thenReturn(null);
-        when(sequenceGeneratorService.generateSequence(anyString())).thenReturn(5L);
         when(inputSanitizer.sanitize(anyString())).thenAnswer(i -> i.getArgument(0));
         when(inputSanitizer.sanitizeList(anyList())).thenAnswer(i -> i.getArgument(0));
         when(aiBioService.generateBio("AI Researcher", Arrays.asList("AI", "ML", "Deep Learning")))
                 .thenReturn("Expert in AI, ML, and Deep Learning with passion for innovation");
 
         com.persons.finder.domain.Person savedPerson = com.persons.finder.domain.Person.builder()
-                .id(5L)
+                .id(UUID.randomUUID().toString())
                 .name("AI Test User")
                 .email("ai.test@example.com")
                 .jobTitle("AI Researcher")
