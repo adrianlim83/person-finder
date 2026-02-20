@@ -1,4 +1,4 @@
 I asked AI to convert kotlin to java via Intellij's AI Chat
-I asked AI to fix my environment issue via Intellij's AI Chat
-I asked AI to implement a working skeleton of the business domain behaviour via Intellij's AI Chat
-I asked AI to implement a test development driven approach via GitHub Agent
+I asked AI to fix my environment issue via Intellij's AI Chat, but I still had to spend some time fixing it manually due to an IDE issue after the recent Windows update.
+I asked AI to implement a working skeleton of the business domain behavior via IntelliJ’s AI Chat, but I had to spend some time refactoring the code due to an inconsistent structure and making adjustments to fit the project’s design patterns. I also implemented the OpenAiBioService class and other incorrect logic.
+I asked AI to implement a test-driven development approach via GitHub Agent; however, I had to correct certain inaccuracies in the code, such as the wrong parameter being sent to the OpenAiBioService class, and adjust the test cases accordingly.
