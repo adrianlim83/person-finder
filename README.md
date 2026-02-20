@@ -221,6 +221,10 @@ java -jar target/PersonsFinder-0.0.1-SNAPSHOT.jar {{Including the above environm
 - [SECURITY.md](SECURITY.md) - Security considerations and prompt injection mitigation
 - [HELP.md](HELP.md) - Spring Boot reference documentation
 
+## Notes
+The current mongo collection id is auto incremented via Counter sequence per collection type in order to keep the current expectation of the initial code preferences. 
+However, for large scale, we should use ObjectID uuidv7 instead.
+
 ## License
 
 This project is provided as-is for technical challenge purposes.
