@@ -206,7 +206,7 @@ mvn test
 ### Package as JAR
 ```bash
 mvn clean package
-java -jar target/person-finder-api-0.0.1-SNAPSHOT.jar {{Including the above environment variables, e.g., -Dmongodb_host=... -Dmongodb_username=... -Dmongodb_password=...}}
+java -jar target/PersonsFinder-0.0.1-SNAPSHOT.jar {{Including the above environment variables, e.g., -Dmongodb_host=... -Dmongodb_username=... -Dmongodb_password=...}}
 ```
 
 ## Documentation
