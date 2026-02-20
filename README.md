@@ -224,6 +224,7 @@ java -jar target/PersonsFinder-0.0.1-SNAPSHOT.jar {{Including the above environm
 ## Notes
 The current mongo collection id is auto incremented via Counter sequence per collection type in order to keep the current expectation of the initial code preferences. 
 However, for large scale, we should use ObjectID uuidv7 instead.
+See the related changes here: [PR #3](https://github.com/adrianlim83/person-finder/pull/3)
 
 ## License
 
