@@ -136,6 +136,12 @@ security.input.max-length=500
 mvn test
 ```
 
+## Tests Coverage Report
+After running tests, the coverage report can be found at:
+```
+/target/site/jacoco/index.html
+```
+
 ## Project Structure
 
 ```

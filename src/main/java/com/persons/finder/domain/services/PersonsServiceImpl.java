@@ -2,7 +2,6 @@ package com.persons.finder.domain.services;
 
 import com.persons.finder.ai.AiBioService;
 import com.persons.finder.data.Person;
-import com.persons.finder.exception.BadRequestException;
 import com.persons.finder.exception.PersonNotFoundException;
 import com.persons.finder.domain.repository.PersonRepository;
 import com.persons.finder.security.InputSanitizer;
