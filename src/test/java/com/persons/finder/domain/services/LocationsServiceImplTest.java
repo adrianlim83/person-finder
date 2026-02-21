@@ -3,6 +3,7 @@ package com.persons.finder.domain.services;
 import com.persons.finder.data.Location;
 import com.persons.finder.domain.Person;
 import com.persons.finder.domain.repository.PersonRepository;
+import com.persons.finder.exception.PersonNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -100,7 +101,7 @@ class LocationsServiceImplTest {
     }
 
     @Test
-    @DisplayName("addLocation should throw IllegalArgumentException when person does not exist")
+    @DisplayName("addLocation should throw PersonNotFoundException when person does not exist")
     void addLocation_WhenPersonDoesNotExist_ShouldThrowException() {
         // Arrange
         Location locationData = new Location(999L, 1.3521, 103.8198, null, null);
@@ -109,7 +110,7 @@ class LocationsServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() -> locationsService.addLocation(locationData))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(PersonNotFoundException.class)
                 .hasMessageContaining("Person not found with id: 999");
 
         verify(personRepository).findById(999L);
@@ -182,14 +183,14 @@ class LocationsServiceImplTest {
     }
 
     @Test
-    @DisplayName("removeLocation should throw IllegalArgumentException when person does not exist")
+    @DisplayName("removeLocation should throw PersonNotFoundException when person does not exist")
     void removeLocation_WhenPersonDoesNotExist_ShouldThrowException() {
         // Arrange
         when(personRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> locationsService.removeLocation(999L))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(PersonNotFoundException.class)
                 .hasMessageContaining("Person not found with id: 999");
 
         verify(personRepository).findById(999L);

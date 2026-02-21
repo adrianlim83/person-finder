@@ -4,6 +4,7 @@ import com.persons.finder.config.LocationConfig;
 import com.persons.finder.data.Location;
 import com.persons.finder.domain.Person;
 import com.persons.finder.domain.repository.PersonRepository;
+import com.persons.finder.exception.PersonNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +32,7 @@ public class LocationsServiceImpl implements LocationsService {
     @Override
     public void addLocation(Location location) {
         Person person = personRepository.findById(location.getReferenceId())
-                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + location.getReferenceId()));
+                .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + location.getReferenceId()));
 
         person.setLocation(new GeoJsonPoint(
                 location.getLongitude(),
@@ -45,7 +46,7 @@ public class LocationsServiceImpl implements LocationsService {
     @Override
     public void removeLocation(Long locationReferenceId) {
         Person person = personRepository.findById(locationReferenceId)
-                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + locationReferenceId));
+                .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + locationReferenceId));
 
         person.setLocation(null);
 
