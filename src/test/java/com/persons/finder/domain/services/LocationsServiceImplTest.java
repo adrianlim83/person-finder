@@ -112,7 +112,7 @@ class LocationsServiceImplTest {
     }
 
     @Test
-    @DisplayName("addLocation should throw IllegalArgumentException when person does not exist")
+    @DisplayName("addLocation should throw PersonNotFoundException when person does not exist")
     void addLocation_WhenPersonDoesNotExist_ShouldThrowException() {
         // Arrange
         String personIdNotExist = UUID.randomUUID().toString();
@@ -122,7 +122,7 @@ class LocationsServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() -> locationsService.addLocation(locationData))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(PersonNotFoundException.class)
                 .hasMessageContaining("Person not found with id: " + personIdNotExist);
 
         verify(personRepository).findById(personIdNotExist);

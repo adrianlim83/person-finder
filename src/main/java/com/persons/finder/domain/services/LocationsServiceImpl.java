@@ -32,7 +32,7 @@ public class LocationsServiceImpl implements LocationsService {
     @Override
     public void addLocation(Location location) {
         Person person = personRepository.findById(location.getReferenceId())
-                .orElseThrow(() -> new IllegalArgumentException("Person not found with id: " + location.getReferenceId()));
+                .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + location.getReferenceId()));
 
         person.setLocation(new GeoJsonPoint(
                 location.getLongitude(),
