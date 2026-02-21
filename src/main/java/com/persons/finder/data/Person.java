@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Person {
 
-    private Long id;
+    private String id;
     @NotBlank(message = "Name is required")
     @Size(max = 500, message = "Name must not exceed 500 characters")
     private final String name;

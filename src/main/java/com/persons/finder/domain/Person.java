@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
-@Document(collection = "persons")
+@Document(collection = "persons_v2")
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,7 +22,7 @@ import java.util.List;
 public class Person {
     
     @Id
-    private Long id;
+    private String id;
 
     @Field("name")
     private String name;
