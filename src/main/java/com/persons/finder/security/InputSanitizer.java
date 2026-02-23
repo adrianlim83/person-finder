@@ -10,21 +10,35 @@ import java.util.stream.Collectors;
 public class InputSanitizer {
     
     private static final int MAX_INPUT_LENGTH = 500;
-    
+
     private static final List<Pattern> DANGEROUS_PATTERNS = List.of(
-        Pattern.compile("ignore\\s+previous\\s+instructions?", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("disregard\\s+all\\s+previous\\s+instructions?", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("forget\\s+everything\\s+above", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("new\\s+instructions?:", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("system\\s*:", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("admin\\s*:", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("\\[\\s*system\\s*\\]", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("\\{\\s*system\\s*\\}", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("<\\s*system\\s*>", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("you\\s+are\\s+now", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("pretend\\s+you\\s+are", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("from\\s+now\\s+on", Pattern.CASE_INSENSITIVE),
-        Pattern.compile("act\\s+as", Pattern.CASE_INSENSITIVE)
+        // 1️⃣ Script / XSS related
+        Pattern.compile(
+                "(?is)" +
+                        "<\\s*script\\b[^>]*>.*?<\\s*/\\s*script>|" +       // <script>...</script>
+                        "(javascript|vbscript)\\s*:|" +                     // javascript:
+                        "data\\s*:\\s*text\\s*/\\s*(html|javascript|css)",  // data:text/...
+                Pattern.DOTALL
+        ),
+
+        // 2️⃣ Prompt injection – instruction override
+        Pattern.compile(
+                "(?i)" +
+                        "(ignore|disregard)\\s+(all\\s+)?previous\\s+instructions?|"+
+                        "forget\\s+(everything|all)\\s+(above|before)|" +
+                        "new\\s+instructions?\\s*:|" +
+                        "from\\s+now\\s+on|" +
+                        "you\\s+are\\s+now|" +
+                        "pretend\\s+you\\s+are|" +
+                        "act\\s+as"
+        ),
+
+        // 3️⃣ Role / system override attempts
+        Pattern.compile(
+                "(?i)" +
+                        "(system|admin)\\s*:|" +
+                        "[\\[{<]\\s*system\\s*[\\]}>]"
+        )
     );
     
     public String sanitize(String input) {
