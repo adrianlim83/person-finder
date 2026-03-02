@@ -10,6 +10,9 @@ public class OpenAIConfig {
     @Value("${ai.openai.api-key}")
     private String apiKey;
 
+    @Value("${ai.prompt}")
+    private String prompt;
+
     @Value("${ai.openai.model:gpt-3.5-turbo}")
     private String model;
 
