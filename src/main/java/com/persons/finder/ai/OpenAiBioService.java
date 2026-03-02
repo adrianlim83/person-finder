@@ -19,8 +19,13 @@ public class OpenAiBioService implements AiBioService {
 
     @Override
     public String generateBio(String jobTitle, List<String> hobbies) {
+        // BIO prompt guidance:
+        // Write a short friendly bio for a Senior Java Developer who loves hiking, photography, and cooking. Avoid any unnecessary text.
+        // Suggested models:
+        // - gpt-3.5-turbo: Cost-effective, generally works well, but may be less polished and expressive.
+        // - gpt-4.1: Balanced choice, offering strong creativity while maintaining factual accuracy.
         String prompt = String.format(
-            "Write a quirky one-sentence bio for someone who is a %s and enjoys %s.",
+            openAIConfig.getPrompt(),
             jobTitle,
             String.join(", ", hobbies)
         );
