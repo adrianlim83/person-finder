@@ -66,13 +66,17 @@ jobs:
       run: mvn clean verify
 
       # --- Install Node & OpenClaw CLI ---
-    - name: Install Node.js
-      uses: actions/setup-node@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: 20
 
+    - name: Install OpenClaw
+      run: npm install openclaw
+
     - name: Run OpenClaw tests
       run: |
+        npx openclaw --version
         npx openclaw run openclaw-tests/api-tests/
 
 #    - name: Configure AWS credentials
