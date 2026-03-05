@@ -69,24 +69,11 @@ jobs:
     - name: Install & run OpenClaw CLI
       run: |
         echo "Installing OpenClaw CLI..."
-        export PATH="/home/runner/.npm-global/bin:$PATH"
-        CI=true
-        
-        # Download installer first
-        curl -fsSL -o install.sh https://openclaw.ai/install.sh
-        
-        # Make it executable
-        chmod +x install.sh
-        
-        # Run the installer and capture errors
-        ./install.sh || { echo "OpenClaw installer failed"; exit 1; }
-        
-        echo "OpenClaw CLI installed successfully!"
+        npm install --global @openclaw/cli
+        export PATH="$HOME/.npm-global/bin:$PATH"
+        echo "Installed OpenClaw CLI!"
         openclaw --version
-        
-        # Run tests
-        openclaw run openclaw-tests/api-tests/ --yes || { echo "OpenClaw tests failed"; exit 1; }
-        
+        openclaw run openclaw-tests/api-tests/ --yes || { echo "OpenClaw tests failed"; exit 1; }        
         echo "OpenClaw CLI tests completed successfully!"
 
 #    - name: Configure AWS credentials
