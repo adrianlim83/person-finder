@@ -65,20 +65,10 @@ jobs:
     - name: Build & run unit tests
       run: mvn clean verify
 
-      # --- Install Node & OpenClaw CLI ---
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Run OpenClaw tests
+      uses: openclaw/openclaw-action@v1
       with:
-        node-version: 20
-
-    - name: Install OpenClaw CLI
-      run: npm install -g @openclaw/cli
-
-    - name: Verify installation
-      run: openclaw --version
-
-    - name: Run tests
-      run: openclaw run openclaw-tests/api-tests/
+        path: openclaw-tests/api-tests
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
