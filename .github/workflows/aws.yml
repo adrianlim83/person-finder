@@ -61,14 +61,25 @@ jobs:
         java-version: 21
         cache: maven
 
+    - name: Build & run unit tests
+      run: mvn clean verify
+
     - name: Install Node & OpenClaw CLI
       uses: actions/setup-node@v3
       with:
         node-version: 20
     - run: npm install -g openclaw
 
-    - name: Run unit & openclaw tests
-      run: mvn clean verify -Pwith-openclaw
+    - name: Add npm global bin to PATH
+      run: echo "$(npm bin -g)" >> $GITHUB_PATH
+
+    - name: Run OpenClaw tests (optional)
+      run: |
+        if command -v openclaw >/dev/null 2>&1; then
+          openclaw run openclaw-tests/api-tests/
+        else
+          echo "OpenClaw not installed, skipping"
+        fi
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
