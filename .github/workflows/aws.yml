@@ -66,17 +66,16 @@ jobs:
       run: mvn clean verify
 
     # --- OpenClaw CLI ---
-    - name: Install OpenClaw CLI
+    - name: Install & run OpenClaw CLI
       run: |
-        curl -L https://github.com/openclaw-ai/openclaw/releases/latest/download/openclaw-linux-amd64 -o openclaw
-        chmod +x openclaw
-        sudo mv openclaw /usr/local/bin/
-
-    - name: Verify OpenClaw
-      run: openclaw --version
-
-    - name: Run OpenClaw Tests
-      run: openclaw run openclaw-tests/api-tests/
+        # Install OpenClaw via official installer script
+        curl -fsSL https://openclaw.ai/install.sh | bash
+        
+        # Verify installation
+        openclaw --version
+        
+        # Run your OpenClaw tests
+        openclaw run openclaw-tests/api-tests/
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
