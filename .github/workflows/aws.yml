@@ -75,7 +75,7 @@ jobs:
         openclaw --version
         
         # Run your OpenClaw tests
-        openclaw run openclaw-tests/api-tests/
+        openclaw run openclaw-tests/api-tests/ --non-interactive
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
