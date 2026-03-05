@@ -65,10 +65,18 @@ jobs:
     - name: Build & run unit tests
       run: mvn clean verify
 
-    - name: Run OpenClaw tests
-      uses: openclaw/openclaw-action@v1
-      with:
-        path: openclaw-tests/api-tests
+    # --- OpenClaw CLI ---
+    - name: Install OpenClaw CLI
+      run: |
+        curl -L https://github.com/openclaw-ai/openclaw/releases/latest/download/openclaw-linux-amd64 -o openclaw
+        chmod +x openclaw
+        sudo mv openclaw /usr/local/bin/
+
+    - name: Verify OpenClaw
+      run: openclaw --version
+
+    - name: Run OpenClaw Tests
+      run: openclaw run openclaw-tests/api-tests/
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
