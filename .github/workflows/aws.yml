@@ -71,16 +71,9 @@ jobs:
       with:
         node-version: 20
 
-    - name: Install & run OpenClaw
+    - name: Run OpenClaw tests
       run: |
-        mkdir -p $HOME/.npm-global
-        npm config set prefix $HOME/.npm-global
-        export PATH=$HOME/.npm-global/bin:$PATH
-        
-        npm install -g openclaw
-        
-        openclaw --version
-        openclaw run openclaw-tests/api-tests/
+        npx openclaw run openclaw-tests/api-tests/
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
