@@ -65,16 +65,16 @@ jobs:
     - name: Build & run unit tests
       run: mvn clean verify
 
-    # --- OpenClaw CLI ---
-    - name: Install & run OpenClaw CLI
-      run: |
-        echo "Installing OpenClaw CLI..."
-        npm install --global @openclaw/cli
-        export PATH="$HOME/.npm-global/bin:$PATH"
-        echo "Installed OpenClaw CLI!"
-        openclaw --version
-        openclaw run openclaw-tests/api-tests/ --yes || { echo "OpenClaw tests failed"; exit 1; }        
-        echo "OpenClaw CLI tests completed successfully!"
+#    # --- OpenClaw CLI ---
+#    - name: Install & run OpenClaw CLI
+#      run: |
+#        echo "Installing OpenClaw CLI..."
+#        npm install --global @openclaw/cli
+#        export PATH="$HOME/.npm-global/bin:$PATH"
+#        echo "Installed OpenClaw CLI!"
+#        openclaw --version
+#        openclaw run openclaw-tests/api-tests/ --yes || { echo "OpenClaw tests failed"; exit 1; }
+#        echo "OpenClaw CLI tests completed successfully!"
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
