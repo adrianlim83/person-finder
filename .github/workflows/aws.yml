@@ -83,13 +83,26 @@ jobs:
       run: echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
 
       # --- Run OpenClaw tests ---
-    - name: Install & run OpenClaw tests
+    - name: Install & run OpenClaw CLI
       run: |
+        # Create npm global directory
         mkdir -p $HOME/.npm-global
+
+        # Configure npm to use it
         npm config set prefix $HOME/.npm-global
+
+        # Install OpenClaw globally
         npm install -g openclaw
+
+        # Add npm global bin to PATH for this shell
         export PATH=$HOME/.npm-global/bin:$PATH
+
+        # Verify installation
+        openclaw --version
+
+        # Run OpenClaw tests
         openclaw run openclaw-tests/api-tests/
+
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
 #      with:
