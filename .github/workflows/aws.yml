@@ -70,12 +70,15 @@ jobs:
       run: |
         # Install OpenClaw via official installer script
         curl -fsSL https://openclaw.ai/install.sh | bash
-        
+
+        # Add npm global bin to PATH in this session
+        export PATH="/home/runner/.npm-global/bin:$PATH"
+
         # Verify installation
         openclaw --version
-        
-        # Run your OpenClaw tests
-        openclaw run openclaw-tests/api-tests/ --yes
+
+        # Run OpenClaw tests non-interactively
+        OPENCLAW_NONINTERACTIVE=true openclaw run openclaw-tests/api-tests/ --yes
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
