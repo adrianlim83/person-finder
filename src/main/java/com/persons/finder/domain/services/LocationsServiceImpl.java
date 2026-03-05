@@ -44,7 +44,7 @@ public class LocationsServiceImpl implements LocationsService {
     }
 
     @Override
-    public void removeLocation(Long locationReferenceId) {
+    public void removeLocation(String locationReferenceId) {
         Person person = personRepository.findById(locationReferenceId)
                 .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + locationReferenceId));
 

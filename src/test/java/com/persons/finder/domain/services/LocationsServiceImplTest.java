@@ -20,10 +20,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.query.NearQuery;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,40 +55,54 @@ class LocationsServiceImplTest {
     @InjectMocks
     private LocationsServiceImpl locationsService;
 
-    private Person testPerson;
-    private GeoJsonPoint testLocation;
+    private Person testPerson1;
+    private GeoJsonPoint testLocation1;
+    private Person testPerson2;
+    private GeoJsonPoint testLocation2;
 
     @BeforeEach
     void setUp() {
         // Arrange - Set up common test data
-        testPerson = Person.builder()
-                .id(1L)
+        testPerson1 = Person.builder()
+                .id(UUID.randomUUID().toString())
                 .name("John Doe")
                 .email("john.doe@example.com")
                 .jobTitle("Software Engineer")
                 .hobbies(Arrays.asList("Reading", "Coding"))
                 .bio("Tech enthusiast")
                 .build();
+        testPerson2 = Person.builder()
+                .id(UUID.randomUUID().toString())
+                .name("Jane Smith")
+                .email("jane.smith@example.com")
+                .jobTitle("Data Scientist")
+                .bio("Data lover")
+                .build();
 
         // GeoJSON Point: longitude first, then latitude
-        testLocation = new GeoJsonPoint(103.8198, 1.3521); // Singapore coordinates
+        testLocation1 = new GeoJsonPoint(103.8198, 1.3521); // Singapore coordinates
+        testLocation2 = new GeoJsonPoint(-122.4194, 37.7749); // San Francisco coordinates
+
+        // Set location data on test persons
+        testPerson1.setLocation(testLocation1);
+        testPerson2.setLocation(testLocation2);
     }
 
     @Test
     @DisplayName("addLocation should successfully add location to existing person")
     void addLocation_WhenPersonExists_ShouldAddLocation() {
         // Arrange
-        Location locationData = new Location(1L, 1.3521, 103.8198, null, null);
+        Location locationData = new Location(testPerson1.getId(), 1.3521, 103.8198, null, null);
 
-        when(personRepository.findById(1L)).thenReturn(Optional.of(testPerson));
-        when(personRepository.save(any(Person.class))).thenReturn(testPerson);
+        when(personRepository.findById(testPerson1.getId())).thenReturn(Optional.of(testPerson1));
+        when(personRepository.save(any(Person.class))).thenReturn(testPerson1);
 
         // Act
         locationsService.addLocation(locationData);
 
         // Assert
         ArgumentCaptor<Person> personCaptor = ArgumentCaptor.forClass(Person.class);
-        verify(personRepository).findById(1L);
+        verify(personRepository).findById(testPerson1.getId());
         verify(personRepository).save(personCaptor.capture());
 
         Person savedPerson = personCaptor.getValue();
@@ -104,16 +115,17 @@ class LocationsServiceImplTest {
     @DisplayName("addLocation should throw PersonNotFoundException when person does not exist")
     void addLocation_WhenPersonDoesNotExist_ShouldThrowException() {
         // Arrange
-        Location locationData = new Location(999L, 1.3521, 103.8198, null, null);
+        String personIdNotExist = UUID.randomUUID().toString();
+        Location locationData = new Location(personIdNotExist, 1.3521, 103.8198, null, null);
 
-        when(personRepository.findById(999L)).thenReturn(Optional.empty());
+        when(personRepository.findById(personIdNotExist)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> locationsService.addLocation(locationData))
                 .isInstanceOf(PersonNotFoundException.class)
-                .hasMessageContaining("Person not found with id: 999");
+                .hasMessageContaining("Person not found with id: " + personIdNotExist);
 
-        verify(personRepository).findById(999L);
+        verify(personRepository).findById(personIdNotExist);
         verify(personRepository, never()).save(any());
     }
 
@@ -121,10 +133,10 @@ class LocationsServiceImplTest {
     @DisplayName("addLocation should handle location coordinates correctly (longitude, latitude order)")
     void addLocation_ShouldUseCorrectCoordinateOrder() {
         // Arrange - Test with specific coordinates to verify order
-        Location locationData = new Location(1L, 51.5074, -0.1278, null, null); // London: lat, lon
+        Location locationData = new Location(testPerson1.getId(), 51.5074, -0.1278, null, null); // London: lat, lon
 
-        when(personRepository.findById(1L)).thenReturn(Optional.of(testPerson));
-        when(personRepository.save(any(Person.class))).thenReturn(testPerson);
+        when(personRepository.findById(testPerson1.getId())).thenReturn(Optional.of(testPerson1));
+        when(personRepository.save(any(Person.class))).thenReturn(testPerson1);
 
         // Act
         locationsService.addLocation(locationData);
@@ -143,11 +155,11 @@ class LocationsServiceImplTest {
     @DisplayName("addLocation should update existing location")
     void addLocation_WhenPersonHasExistingLocation_ShouldUpdateLocation() {
         // Arrange
-        testPerson.setLocation(new GeoJsonPoint(100.0, 10.0)); // Old location
-        Location newLocationData = new Location(1L, 1.3521, 103.8198, null, null);
+        testPerson1.setLocation(new GeoJsonPoint(100.0, 10.0)); // Old location
+        Location newLocationData = new Location(testPerson1.getId(), 1.3521, 103.8198, null, null);
 
-        when(personRepository.findById(1L)).thenReturn(Optional.of(testPerson));
-        when(personRepository.save(any(Person.class))).thenReturn(testPerson);
+        when(personRepository.findById(testPerson1.getId())).thenReturn(Optional.of(testPerson1));
+        when(personRepository.save(any(Person.class))).thenReturn(testPerson1);
 
         // Act
         locationsService.addLocation(newLocationData);
@@ -165,17 +177,17 @@ class LocationsServiceImplTest {
     @DisplayName("removeLocation should successfully remove location from person")
     void removeLocation_WhenPersonExists_ShouldRemoveLocation() {
         // Arrange
-        testPerson.setLocation(testLocation);
+        testPerson1.setLocation(testLocation1);
 
-        when(personRepository.findById(1L)).thenReturn(Optional.of(testPerson));
-        when(personRepository.save(any(Person.class))).thenReturn(testPerson);
+        when(personRepository.findById(testPerson1.getId())).thenReturn(Optional.of(testPerson1));
+        when(personRepository.save(any(Person.class))).thenReturn(testPerson1);
 
         // Act
-        locationsService.removeLocation(1L);
+        locationsService.removeLocation(testPerson1.getId());
 
         // Assert
         ArgumentCaptor<Person> personCaptor = ArgumentCaptor.forClass(Person.class);
-        verify(personRepository).findById(1L);
+        verify(personRepository).findById(testPerson1.getId());
         verify(personRepository).save(personCaptor.capture());
 
         Person savedPerson = personCaptor.getValue();
@@ -186,14 +198,15 @@ class LocationsServiceImplTest {
     @DisplayName("removeLocation should throw PersonNotFoundException when person does not exist")
     void removeLocation_WhenPersonDoesNotExist_ShouldThrowException() {
         // Arrange
-        when(personRepository.findById(999L)).thenReturn(Optional.empty());
+        String personIdNotExist = UUID.randomUUID().toString();
+        when(personRepository.findById(personIdNotExist)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> locationsService.removeLocation(999L))
+        assertThatThrownBy(() -> locationsService.removeLocation(personIdNotExist))
                 .isInstanceOf(PersonNotFoundException.class)
-                .hasMessageContaining("Person not found with id: 999");
+                .hasMessageContaining("Person not found with id: " + personIdNotExist);
 
-        verify(personRepository).findById(999L);
+        verify(personRepository).findById(personIdNotExist);
         verify(personRepository, never()).save(any());
     }
 
@@ -201,13 +214,13 @@ class LocationsServiceImplTest {
     @DisplayName("removeLocation should handle person without existing location")
     void removeLocation_WhenPersonHasNoLocation_ShouldSetLocationToNull() {
         // Arrange - Person has no location
-        testPerson.setLocation(null);
+        testPerson1.setLocation(null);
 
-        when(personRepository.findById(1L)).thenReturn(Optional.of(testPerson));
-        when(personRepository.save(any(Person.class))).thenReturn(testPerson);
+        when(personRepository.findById(testPerson1.getId())).thenReturn(Optional.of(testPerson1));
+        when(personRepository.save(any(Person.class))).thenReturn(testPerson1);
 
         // Act
-        locationsService.removeLocation(1L);
+        locationsService.removeLocation(testPerson1.getId());
 
         // Assert
         ArgumentCaptor<Person> personCaptor = ArgumentCaptor.forClass(Person.class);
@@ -221,22 +234,8 @@ class LocationsServiceImplTest {
     @DisplayName("findAround should return persons within specified radius")
     void findAround_WhenPersonsExistInRadius_ShouldReturnLocations() {
         // Arrange
-        Person person1 = Person.builder()
-                .id(1L)
-                .name("Person 1")
-                .location(new GeoJsonPoint(103.8198, 1.3521))
-                .bio("Bio 1")
-                .build();
-
-        Person person2 = Person.builder()
-                .id(2L)
-                .name("Person 2")
-                .location(new GeoJsonPoint(103.8500, 1.3700))
-                .bio("Bio 2")
-                .build();
-
-        GeoResult<Person> geoResult1 = new GeoResult<>(person1, new Distance(1.5, Metrics.KILOMETERS));
-        GeoResult<Person> geoResult2 = new GeoResult<>(person2, new Distance(3.2, Metrics.KILOMETERS));
+        GeoResult<Person> geoResult1 = new GeoResult<>(testPerson1, new Distance(1.5, Metrics.KILOMETERS));
+        GeoResult<Person> geoResult2 = new GeoResult<>(testPerson2, new Distance(3.2, Metrics.KILOMETERS));
 
         GeoResults<Person> geoResults = new GeoResults<>(
                 Arrays.asList(geoResult1, geoResult2),
@@ -253,14 +252,14 @@ class LocationsServiceImplTest {
         assertThat(results).hasSize(2);
 
         Location loc1 = results.get(0);
-        assertThat(loc1.getReferenceId()).isEqualTo(1L);
+        assertThat(loc1.getReferenceId()).isEqualTo(testPerson1.getId());
         assertThat(loc1.getLatitude()).isEqualTo(103.8198);  // Currently gets longitude value
         assertThat(loc1.getLongitude()).isEqualTo(1.3521);   // Currently gets latitude value
         assertThat(loc1.getDistanceInKm()).isEqualTo(1.5);
-        assertThat(loc1.getBio()).isEqualTo("Bio 1");
+        assertThat(loc1.getBio()).isEqualTo(testPerson1.getBio());
 
         Location loc2 = results.get(1);
-        assertThat(loc2.getReferenceId()).isEqualTo(2L);
+        assertThat(loc2.getReferenceId()).isEqualTo(testPerson2.getId());
         assertThat(loc2.getDistanceInKm()).isEqualTo(3.2);
 
         verify(mongoTemplate).geoNear(any(NearQuery.class), eq(Person.class));
@@ -334,8 +333,9 @@ class LocationsServiceImplTest {
     @DisplayName("findAround should handle large radius searches")
     void findAround_WithLargeRadius_ShouldReturnResults() {
         // Arrange
+        String personId = UUID.randomUUID().toString();
         Person distantPerson = Person.builder()
-                .id(10L)
+                .id(personId)
                 .name("Distant Person")
                 .location(new GeoJsonPoint(0.0, 0.0)) // Equator, Prime Meridian
                 .bio("Far away bio")
@@ -386,8 +386,9 @@ class LocationsServiceImplTest {
     @DisplayName("findAround should correctly map GeoJSON coordinates to Location DTO")
     void findAround_ShouldMapCoordinatesCorrectly() {
         // Arrange - Test coordinate mapping from GeoJSON to DTO
+        String personId = UUID.randomUUID().toString();
         Person person = Person.builder()
-                .id(5L)
+                .id(personId)
                 .name("Test Person")
                 .location(new GeoJsonPoint(-122.4194, 37.7749)) // San Francisco (lon, lat)
                 .bio("SF resident")

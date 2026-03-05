@@ -33,7 +33,7 @@ public class PersonController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}/location")
     public void updateLocation(
-        @PathVariable Long id,
+        @PathVariable String id,
         @Valid @RequestBody Location request
     ) {
         request.setReferenceId(id);
