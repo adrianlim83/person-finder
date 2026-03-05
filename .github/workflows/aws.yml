@@ -71,13 +71,14 @@ jobs:
       with:
         node-version: 20
 
-    - name: Install OpenClaw
-      run: npm install openclaw
+    - name: Install OpenClaw CLI
+      run: npm install -g @openclaw/cli
 
-    - name: Run OpenClaw tests
-      run: |
-        npm exec openclaw -- --version
-        npm exec openclaw -- run openclaw-tests/api-tests/
+    - name: Verify installation
+      run: openclaw --version
+
+    - name: Run tests
+      run: openclaw run openclaw-tests/api-tests/
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
