@@ -76,14 +76,20 @@ jobs:
         mkdir -p $HOME/.npm-global
         npm config set prefix $HOME/.npm-global
         npm install -g openclaw
+        export PATH=$HOME/.npm-global/bin:$PATH
+        openclaw --version
 
     - name: Add OpenClaw to PATH
       run: echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
 
       # --- Run OpenClaw tests ---
-    - name: Run OpenClaw tests
-      run: openclaw run openclaw-tests/api-tests/
-
+    - name: Install & run OpenClaw tests
+      run: |
+        mkdir -p $HOME/.npm-global
+        npm config set prefix $HOME/.npm-global
+        npm install -g openclaw
+        export PATH=$HOME/.npm-global/bin:$PATH
+        openclaw run openclaw-tests/api-tests/
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1
 #      with:
