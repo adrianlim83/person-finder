@@ -61,8 +61,14 @@ jobs:
         java-version: 21
         cache: maven
 
-    - name: Run unit & integration tests
-      run: mvn clean verify
+    - name: Install Node & OpenClaw CLI
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+    - run: npm install -g openclaw
+
+    - name: Run unit & openclaw tests
+      run: mvn clean verify -Pwith-openclaw
 
 #    - name: Configure AWS credentials
 #      uses: aws-actions/configure-aws-credentials@v1

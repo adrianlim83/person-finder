@@ -163,4 +163,37 @@
         </plugins>
     </build>
 
+    <!-- OpenClaw Profile -->
+    <profiles>
+        <profile>
+            <id>with-openclaw</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.6.3</version>
+                        <executions>
+                            <execution>
+                                <id>run-openclaw</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>openclaw</executable>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>openclaw-tests/api-tests/</argument>
+                                    </arguments>
+                                    <failOnError>false</failOnError>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
