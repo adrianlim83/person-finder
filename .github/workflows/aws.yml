@@ -61,8 +61,8 @@ jobs:
         java-version: 21
         cache: maven
 
-    # --- Maven build + unit tests ---
-    - name: Build & run unit tests
+    # --- Maven build + unit tests + API tests ---
+    - name: Build & run unit, integration & API tests
       run: mvn clean verify
 
 #    # --- OpenClaw CLI ---
