@@ -8,25 +8,26 @@ import com.persons.finder.security.InputSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PersonsServiceImpl implements PersonsService {
 
-    private final SequenceGeneratorService sequenceGeneratorService;
     private final PersonRepository personRepository;
     private final AiBioService aiBioService;
     private final InputSanitizer inputSanitizer;
 
     @Override
-    public Person getById(Long id) {
+    public Person getById(String id) {
         com.persons.finder.domain.Person person = personRepository.findById(id)
                 .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + id));
         return new Person(person.getId(), person.getName(), person.getEmail(), person.getJobTitle(), person.getHobbies(), person.getBio());
     }
 
     @Override
+    @Transactional
     public Person save(Person person) {
 
         com.persons.finder.domain.Person domainPerson;
@@ -37,10 +38,7 @@ public class PersonsServiceImpl implements PersonsService {
             if (existingPerson != null) {
                 domainPerson = existingPerson;
             } else {
-                long newId = sequenceGeneratorService.generateSequence(com.persons.finder.domain.Person.class.getSimpleName());
-                domainPerson = com.persons.finder.domain.Person.builder()
-                        .id(newId)
-                        .build();
+                domainPerson = new com.persons.finder.domain.Person();
             }
 
         } else {

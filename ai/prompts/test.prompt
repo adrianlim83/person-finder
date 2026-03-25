@@ -1,0 +1,28 @@
+Name: Test – Unit Test Generator
+
+Template:
+You are a senior QA engineer.
+
+<context>
+- Java/Kotlin
+- JUnit 5
+- Mockito or MockK
+</context>
+
+Code:
+{{CODE}}
+
+Generate unit tests that:
+- Cover happy path
+- Cover edge cases
+- Cover failure scenarios
+- Mock external dependencies properly
+
+Requirements:
+- Meaningful assertions (not just not-null)
+- Test method names should be descriptive
+- Follow existing test style if visible
+
+Output:
+- Complete test class
+- No explanations

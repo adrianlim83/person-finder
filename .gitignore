@@ -1,3 +1,41 @@
 /.idea/**
 /target/**
 /.idea/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Application properties with credentials
+application-local.properties
+application-*.properties
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# Build artifacts
+*.jar
+*.war
+*.ear
+*.class
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~

@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
-        log.error("Bad request: {}", ex.getMessage());
+        log.error("Bad request occurred");
         ErrorResponse error = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.BAD_REQUEST.value())
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PersonNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlePersonNotFoundException(PersonNotFoundException ex) {
-        log.error("Person not found: {}", ex.getMessage());
+        log.error("Person not found");
         ErrorResponse error = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.NOT_FOUND.value())
@@ -45,8 +45,8 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex) {
-        log.error("Validation error: {}", ex.getMessage());
-        
+        log.error("Validation error occurred");
+
         Map<String, String> errors = ex.getBindingResult()
             .getFieldErrors()
             .stream()
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
                 error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Invalid value",
                 (existing, replacement) -> existing
             ));
-        
+
         ErrorResponse error = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.BAD_REQUEST.value())
@@ -63,14 +63,14 @@ public class GlobalExceptionHandler {
             .message("Invalid request parameters")
             .validationErrors(errors)
             .build();
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
     
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
-        log.error("Constraint violation: {}", ex.getMessage());
-        
+        log.error("Constraint violation occurred");
+
         Map<String, String> errors = ex.getConstraintViolations()
             .stream()
             .collect(Collectors.toMap(
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
                 ConstraintViolation::getMessage,
                 (existing, replacement) -> existing
             ));
-        
+
         ErrorResponse error = ErrorResponse.builder()
             .timestamp(LocalDateTime.now())
             .status(HttpStatus.BAD_REQUEST.value())
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
             .message("Invalid request parameters")
             .validationErrors(errors)
             .build();
-        
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
     

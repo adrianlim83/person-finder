@@ -10,7 +10,7 @@ import lombok.Data;
 public class Location {
 
     // Tip: Person's id can be used for this field
-    private Long referenceId;
+    private String referenceId;
     @NotNull(message = "Latitude is required")
     private Double latitude;
     @NotNull(message = "Longitude is required")
