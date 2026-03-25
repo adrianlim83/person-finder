@@ -253,8 +253,8 @@ class LocationsServiceImplTest {
 
         Location loc1 = results.get(0);
         assertThat(loc1.getReferenceId()).isEqualTo(testPerson1.getId());
-        assertThat(loc1.getLatitude()).isEqualTo(103.8198);  // Currently gets longitude value
-        assertThat(loc1.getLongitude()).isEqualTo(1.3521);   // Currently gets latitude value
+        assertThat(loc1.getLatitude()).isEqualTo(1.3521);  // Currently gets longitude value
+        assertThat(loc1.getLongitude()).isEqualTo(103.8198);   // Currently gets latitude value
         assertThat(loc1.getDistanceInKm()).isEqualTo(1.5);
         assertThat(loc1.getBio()).isEqualTo(testPerson1.getBio());
 
@@ -413,7 +413,7 @@ class LocationsServiceImplTest {
         // Assert
         assertThat(results).hasSize(1);
         Location location = results.get(0);
-        assertThat(location.getLatitude()).isEqualTo(-122.4194);  // Currently gets longitude value
-        assertThat(location.getLongitude()).isEqualTo(37.7749);   // Currently gets latitude value
+        assertThat(location.getLatitude()).isEqualTo(37.7749);  // Currently gets longitude value
+        assertThat(location.getLongitude()).isEqualTo(-122.4194);   // Currently gets latitude value
     }
 }

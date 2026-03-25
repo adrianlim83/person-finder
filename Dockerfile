@@ -10,5 +10,5 @@ RUN mvn -f /home/app/person-finder/pom.xml clean package -DskipTests
 # Package stage
 #
 FROM eclipse-temurin:21-jre-alpine
-COPY --from=build /home/app/person-finder/target/person-finder.jar /usr/local/lib/person-finder.jar
+COPY --from=build /home/app/person-finder/target/PersonsFinder-0.0.1-SNAPSHOT.jar /usr/local/lib/person-finder.jar
 ENTRYPOINT ["sh", "-c", "java -Xms${heap_min:-512m} -Xmx${heap_max:-2g} $JAVA_OPTS -jar /usr/local/lib/person-finder.jar"]

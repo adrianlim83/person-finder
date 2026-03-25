@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.query.NearQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ public class LocationsServiceImpl implements LocationsService {
     private final MongoTemplate mongoTemplate;
 
     @Override
+    @Transactional
     public void addLocation(Location location) {
         Person person = personRepository.findById(location.getReferenceId())
                 .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + location.getReferenceId()));
@@ -39,19 +41,20 @@ public class LocationsServiceImpl implements LocationsService {
                 location.getLatitude()
         ));
 
-        Person updated = personRepository.save(person);
-        log.info("Updated location for person with id: {}", updated.getId());
+        personRepository.save(person);
+        log.info("Location updated successfully");
     }
 
     @Override
+    @Transactional
     public void removeLocation(String locationReferenceId) {
         Person person = personRepository.findById(locationReferenceId)
                 .orElseThrow(() -> new PersonNotFoundException("Person not found with id: " + locationReferenceId));
 
         person.setLocation(null);
 
-        Person updated = personRepository.save(person);
-        log.info("Removed location for person with id: {}", updated.getId());
+        personRepository.save(person);
+        log.info("Location removed successfully");
     }
 
     @Override
@@ -70,11 +73,12 @@ public class LocationsServiceImpl implements LocationsService {
         GeoResults<Person> results = mongoTemplate.geoNear(nearQuery, Person.class);
 
         // Map results to DTO with distance
+        // GeoJsonPoint: getX() = longitude, getY() = latitude
         return results.getContent().stream()
                 .map(geoResult -> {
                     Person person = geoResult.getContent();
                     double distanceKm = geoResult.getDistance().getValue();
-                    return new Location(person.getId(), person.getLocation().getX(), person.getLocation().getY(), distanceKm, person.getBio());
+                    return new Location(person.getId(), person.getLocation().getY(), person.getLocation().getX(), distanceKm, person.getBio());
                 })
                 .collect(Collectors.toList());
     }
